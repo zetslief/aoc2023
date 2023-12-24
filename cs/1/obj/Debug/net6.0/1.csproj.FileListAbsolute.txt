@@ -1,0 +1,15 @@
+/home/cube/progs/aoc2023/cs/1/bin/Debug/net6.0/1
+/home/cube/progs/aoc2023/cs/1/bin/Debug/net6.0/1.deps.json
+/home/cube/progs/aoc2023/cs/1/bin/Debug/net6.0/1.runtimeconfig.json
+/home/cube/progs/aoc2023/cs/1/bin/Debug/net6.0/1.dll
+/home/cube/progs/aoc2023/cs/1/bin/Debug/net6.0/1.pdb
+/home/cube/progs/aoc2023/cs/1/obj/Debug/net6.0/1.csproj.AssemblyReference.cache
+/home/cube/progs/aoc2023/cs/1/obj/Debug/net6.0/1.GeneratedMSBuildEditorConfig.editorconfig
+/home/cube/progs/aoc2023/cs/1/obj/Debug/net6.0/1.AssemblyInfoInputs.cache
+/home/cube/progs/aoc2023/cs/1/obj/Debug/net6.0/1.AssemblyInfo.cs
+/home/cube/progs/aoc2023/cs/1/obj/Debug/net6.0/1.csproj.CoreCompileInputs.cache
+/home/cube/progs/aoc2023/cs/1/obj/Debug/net6.0/1.dll
+/home/cube/progs/aoc2023/cs/1/obj/Debug/net6.0/refint/1.dll
+/home/cube/progs/aoc2023/cs/1/obj/Debug/net6.0/1.pdb
+/home/cube/progs/aoc2023/cs/1/obj/Debug/net6.0/1.genruntimeconfig.cache
+/home/cube/progs/aoc2023/cs/1/obj/Debug/net6.0/ref/1.dll
