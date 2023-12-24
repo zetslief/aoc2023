@@ -1,7 +1,7 @@
 ﻿// First: 54388
 // Second: 53515
 
-var content = File.ReadAllText("data.txt");
+var content = File.ReadAllText("./../../data/1.txt");
 
 Console.WriteLine($"First: {First(content)}");
 Console.WriteLine($"Second: {Second(content)}");
