@@ -25,8 +25,7 @@ static int First(string content)
             var (first, last) when first is not null && last is not null
                 => first.Value * 10 + last.Value,
             var (first, last) => throw new InvalidOperationException(
-                $"Failed to parse: '{line}'. First: '{first}' Last: '{last}'."
-            ),
+                $"Failed to parse: '{line}'. First: '{first}' Last: '{last}'."),
         };
     }
 
@@ -45,14 +44,36 @@ static int First(string content)
 
 static int Second(string content)
 {
-    var sum = 0;
-    int? firstValue = null;
-    int? lastValue = null;
+    static IEnumerable<string> SplitLines(string lines)
+        => lines.Split(Environment.NewLine)
+            .Where(l => !string.IsNullOrEmpty(l));
 
-    const int minLength = 3;
-    const int maxLength = 5;
+    static int SumFirstAndLastNumbers(string line)
+    {
+        return ProcessLine(line[..Math.Min(5, line.Length)], line[1..], null, null) switch
+        {
+            var (first, last) when first is not null && last is not null
+                => first.Value * 10 + last.Value,
+            var otherwise => throw new InvalidOperationException(
+                $"Failed to parse: '{line}'. Values: '{otherwise}'."),
+        };
+    }
 
-    int? ProcessChunk(ReadOnlySpan<char> chunk)
+    static (int? first, int? last) ProcessLine(ReadOnlySpan<char> head, ReadOnlySpan<char> tail, int? first, int? last)
+    {
+        int? result = int.TryParse(head[..1], out var digit)
+            ? digit
+            : ProcessChunk(head);
+        return tail.Length == 0
+            ? (first.HasValue ? first : result, result.HasValue ? result : last)
+            : ProcessLine(
+                tail[..Math.Min(5, tail.Length)],
+                tail[1..],
+                first.HasValue ? first : result,
+                result.HasValue ? result : last);
+    }
+
+    static int? ProcessChunk(ReadOnlySpan<char> chunk)
     {
         if (chunk.Length > 0 && char.IsDigit(chunk[0])) return null;
         return chunk.Length switch
@@ -63,39 +84,9 @@ static int Second(string content)
         };
     }
 
-    foreach (var line in content.Split('\n'))
-    {
-        if (line.Length == 0) continue;
-        for (int index = 0; index < line.Length; ++index)
-        {
-            var length = Math.Min(line.Length - index, 5);
-            var current = line[index];
-            var newValue = char.IsDigit(current)
-                ? int.Parse(current.ToString())
-                : ProcessChunk(line.AsSpan(index, length));
-            if (newValue.HasValue)
-            {
-                if (firstValue.HasValue)
-                {
-                    lastValue = newValue;
-                }
-                else
-                {
-                    firstValue = newValue;
-                    lastValue = newValue;
-                }
-            }
-        }
-        (firstValue, lastValue) = Calculate(firstValue.Value, lastValue.Value, ref sum);
-    }
-
-    return sum;
-}
-
-static (int?, int?) Calculate(int first, int last, ref int acc)
-{
-    acc += first * 10 + last;
-    return (null, null);
+    return SplitLines(content)
+        .Select(SumFirstAndLastNumbers)
+        .Sum();
 }
 
 enum Numbers
