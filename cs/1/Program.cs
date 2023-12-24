@@ -78,7 +78,6 @@ static int Second(string content)
         static bool Compare(ReadOnlySpan<char> left, ReadOnlySpan<char> right)
             => MemoryExtensions.Equals(left, right, StringComparison.Ordinal);
 
-        if (chunk.Length > 0 && char.IsDigit(chunk[0])) return null;
         return chunk.Length switch
         {
             3 => Compare(chunk, "one") ? 1
