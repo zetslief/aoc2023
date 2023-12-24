@@ -6,26 +6,35 @@ var content = File.ReadAllText("./../../data/1.txt");
 Console.WriteLine($"First: {First(content)}");
 Console.WriteLine($"Second: {Second(content)}");
 
-static int First(string content) {
+static int First(string content)
+{
     static IEnumerable<string> SplitLines(string lines)
         => lines.Split(Environment.NewLine).Where(l => !string.IsNullOrEmpty(l));
 
     static (int? first, int? last) ProcessNewNumber(ReadOnlySpan<char> @new, int? first, int? last)
         => int.TryParse(@new, out var value)
             ? first.HasValue
-                ? (first, value) 
+                ? (first, value)
                 : (value, value)
             : (first, last);
 
-    static int SumFirstAndLastNumbers(string line) {
-        return ProcessLine(line[..1], line[1..], null, null);
+    static int SumFirstAndLastNumbers(string line)
+    {
+        return ProcessLine(line[..1], line[1..], null, null) switch
+        {
+            var (first, last) when first is not null && last is not null
+                => first.Value * 10 + last.Value,
+            var (first, last) => throw new InvalidOperationException(
+                $"Failed to parse: '{line}'. First: '{first}' Last: '{last}'."
+            ),
+        };
     }
 
-    static int ProcessLine(ReadOnlySpan<char> Head, ReadOnlySpan<char> Tail, int? first, int? last)
+    static (int? first, int? last) ProcessLine(ReadOnlySpan<char> Head, ReadOnlySpan<char> Tail, int? first, int? last)
     {
         (first, last) = ProcessNewNumber(Head, first, last);
         return Tail.Length == 0
-            ? first.Value * 10 + last.Value
+            ? (first, last)
             : ProcessLine(Tail[..1], Tail[1..], first, last);
     }
 
@@ -34,7 +43,8 @@ static int First(string content) {
         .Sum();
 }
 
-static int Second(string content) {
+static int Second(string content)
+{
     var sum = 0;
     int? firstValue = null;
     int? lastValue = null;
@@ -42,16 +52,19 @@ static int Second(string content) {
     const int minLength = 3;
     const int maxLength = 5;
 
-    int? ProcessChunk(ReadOnlySpan<char> chunk) {
+    int? ProcessChunk(ReadOnlySpan<char> chunk)
+    {
         if (chunk.Length > 0 && char.IsDigit(chunk[0])) return null;
-        return chunk.Length switch {
+        return chunk.Length switch
+        {
             < 3 => null,
-            < 6 => Enum.TryParse<Numbers>(chunk.ToString(), out var value) ? (int)value : ProcessChunk(chunk.Slice(0, chunk.Length -1 )),
+            < 6 => Enum.TryParse<Numbers>(chunk.ToString(), out var value) ? (int)value : ProcessChunk(chunk.Slice(0, chunk.Length - 1)),
             _ => throw new InvalidOperationException("Chunk cannot be more than 5."),
         };
     }
 
-    foreach (var line in content.Split('\n')) {
+    foreach (var line in content.Split('\n'))
+    {
         if (line.Length == 0) continue;
         for (int index = 0; index < line.Length; ++index)
         {
@@ -60,10 +73,14 @@ static int Second(string content) {
             var newValue = char.IsDigit(current)
                 ? int.Parse(current.ToString())
                 : ProcessChunk(line.AsSpan(index, length));
-            if (newValue.HasValue) {
-                if (firstValue.HasValue) {
+            if (newValue.HasValue)
+            {
+                if (firstValue.HasValue)
+                {
                     lastValue = newValue;
-                } else {
+                }
+                else
+                {
                     firstValue = newValue;
                     lastValue = newValue;
                 }
@@ -75,12 +92,14 @@ static int Second(string content) {
     return sum;
 }
 
-static (int?, int?) Calculate(int first, int last, ref int acc) {
+static (int?, int?) Calculate(int first, int last, ref int acc)
+{
     acc += first * 10 + last;
     return (null, null);
 }
 
-enum Numbers {
+enum Numbers
+{
     one = 1, two = 2, three = 3,
     four = 4, five = 5, six = 6,
     seven = 7, eight = 8, nine = 9
