@@ -75,23 +75,29 @@ static int Second(string content)
 
     static int? ProcessChunk(ReadOnlySpan<char> chunk)
     {
+        static bool Compare(ReadOnlySpan<char> left, ReadOnlySpan<char> right)
+            => MemoryExtensions.Equals(left, right, StringComparison.Ordinal);
+
         if (chunk.Length > 0 && char.IsDigit(chunk[0])) return null;
         return chunk.Length switch
         {
-            < 3 => null,
-            < 6 => Enum.TryParse<Numbers>(chunk.ToString(), out var value) ? (int)value : ProcessChunk(chunk.Slice(0, chunk.Length - 1)),
-            _ => throw new InvalidOperationException("Chunk cannot be more than 5."),
+            3 => Compare(chunk, "one") ? 1
+                : Compare(chunk, "two") ? 2
+                : Compare(chunk, "six") ? 6
+                : null,
+            4 => Compare(chunk, "four") ? 4
+                : Compare(chunk, "five") ? 5
+                : Compare(chunk, "nine") ? 9
+                : ProcessChunk(chunk[..^1]),
+            5 => Compare(chunk, "three") ? 3
+                : Compare(chunk, "seven") ? 7
+                : Compare(chunk, "eight") ? 8
+                : ProcessChunk(chunk[..^1]),
+            _ => null,
         };
     }
 
     return SplitLines(content)
         .Select(SumFirstAndLastNumbers)
         .Sum();
-}
-
-enum Numbers
-{
-    one = 1, two = 2, three = 3,
-    four = 4, five = 5, six = 6,
-    seven = 7, eight = 8, nine = 9
 }
