@@ -1,4 +1,4 @@
--module (aoc).
+-module (aoc1).
 -export ([main/0]).
 
 main() -> 
@@ -48,7 +48,7 @@ find_numbers(Line) when is_binary(Line) ->
 
 find_numbers(<<Char:1/binary, Rest/binary>>, Values) when Char >= <<$0>>, Char =< <<$9>> ->
     find_numbers(Rest, values(Char, Values));
-find_numbers(<<Char:1/binary, Rest/binary>>, Values) ->
+find_numbers(<<_Char:1/binary, Rest/binary>>, Values) ->
     find_numbers(Rest, Values);
 find_numbers(<<>>, {First, Last}) ->
     {First, Last}.
