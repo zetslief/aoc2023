@@ -35,7 +35,7 @@ static int Second(IEnumerable<Game> games)
 
     static int Power(IEnumerable<int> colors)
         => colors.Aggregate((left, right) => left * right);
-    
+
     return games.Select(game => game.Sets)
         .Select(CalculateMinNumberOfColors)
         .Select(Power)
@@ -53,10 +53,7 @@ static Game ParseGame(string line)
             slice = slice[end..];
             return gameId;
         }
-        else
-        {
-            return null;
-        }
+        else return null;
     }
 
     static IReadOnlyCollection<Set>? ParseAllSets(ref ReadOnlySpan<char> slice)
