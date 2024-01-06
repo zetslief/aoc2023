@@ -4,27 +4,29 @@ const int maxRed = 12;
 const int maxGreen = 13;
 const int maxBlue = 14;
 
-var fileContent = File.ReadAllText(DataFile); 
-Console.WriteLine(fileContent);
-var games = new List<Game>();
-foreach (var line in fileContent.Split(Environment.NewLine))
-{
-    if (string.IsNullOrEmpty(line)) break;
-    var game = ParseGame(line);
-    games.Add(game);
-}
+var games = File.ReadAllText(DataFile)
+    .TrimEnd('\n')
+    .Split(Environment.NewLine)
+    .Select(ParseGame)
+    .ToArray();
 
 Console.WriteLine($"First: {First(games)}");
-Console.WriteLine($"First: {Second(games)}");
+Console.WriteLine($"Second: {Second(games)}");
 
-static int First(IEnumerable<Game> games) => games
-    .Where(game => game.Sets.All(set => set.Red <= maxRed && set.Green <= maxGreen && set.Blue <= maxBlue))
-    .Select(game => game.Id)
-    .Sum();
+static int First(IEnumerable<Game> games)
+{
+    static bool IsSetWithinLimits(Set set)
+        => set.Red <= maxRed && set.Green <= maxGreen && set.Blue <= maxBlue;
+
+    return games
+        .Where(game => game.Sets.All(IsSetWithinLimits))
+        .Select(game => game.Id)
+        .Sum();
+}
 
 static int Second(IEnumerable<Game> games)
 {
-    static IEnumerable<int> GetMinNumberOfColors(IEnumerable<Set> sets)
+    static IEnumerable<int> CalculateMinNumberOfColors(IEnumerable<Set> sets)
     {
         yield return sets.Select(s => s.Red).Max();
         yield return sets.Select(s => s.Green).Max();
@@ -35,12 +37,10 @@ static int Second(IEnumerable<Game> games)
         => colors.Aggregate((left, right) => left * right);
     
     return games.Select(game => game.Sets)
-        .Select(GetMinNumberOfColors)
+        .Select(CalculateMinNumberOfColors)
         .Select(Power)
         .Sum();
 }
-
-
 
 static Game ParseGame(string line)
 {
