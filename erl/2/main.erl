@@ -6,10 +6,12 @@ main() ->
     Lines = binary:split(Content, <<"\n">>, [global, trim]), 
     Games = lists:map(fun parse_game/1, Lines),
     FirstResult = first(Games),
-    io:format("First: ~w~n", [FirstResult]).
+    io:format("First: ~w~n", [FirstResult]),
+    SecondResult = second(Games),
+    io:format("Second: ~w~n", [SecondResult]).
 
 first(Games) ->
-    CalculateSubset = fun (Subset) ->
+    CalculateSet = fun (Subset) ->
         lists:foldl(fun ({Number, Color}, {Red, Green, Blue}) ->
             case Color of
                 red -> {Red + Number, Green, Blue};
@@ -25,13 +27,31 @@ first(Games) ->
         Red =< RedLimit andalso Green =< GreenLimit andalso Blue =< BlueLimit
     end,
     EvaluateGame = fun ({GameId, Set}) ->
-        case lists:all(SubsetWithinLimits, lists:map(CalculateSubset, Set)) of
+        case lists:all(SubsetWithinLimits, lists:map(CalculateSet, Set)) of
             true -> GameId;
             false -> 0
         end
     end,
     CorrectGames = lists:map(EvaluateGame, Games),
     lists:foldl(fun (Elem, Acc) -> Elem + Acc end, 0, CorrectGames).
+
+second(Games) ->
+    EvaluateSubset = fun ({Number, Color}, {RedAcc, GreenAcc, BlueAcc}) ->
+        case Color of 
+            red -> {if Number > RedAcc -> Number; true -> RedAcc end, GreenAcc, BlueAcc};
+            green -> {RedAcc, if Number > GreenAcc -> Number; true -> GreenAcc end, BlueAcc};
+            blue -> {RedAcc, GreenAcc, if Number > BlueAcc -> Number; true -> BlueAcc end}
+        end
+    end,
+    EvaluateSet = fun (Set) ->
+        Subsets = lists:flatten(Set),
+        {Red, Green, Blue} = lists:foldl(EvaluateSubset, {0, 0, 0}, Subsets),
+        Red * Green * Blue
+    end,
+    EvaluateGame = fun ({_GameId, Set}) ->
+        EvaluateSet(Set)
+    end,
+    lists:sum(lists:map(EvaluateGame, Games)).
 
 parse_game(Content) ->
     {GameId, Rest} = game_id(Content),
