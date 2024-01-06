@@ -1,9 +1,5 @@
 ﻿const string DataFile = "./../../data/2.txt";
 
-const int maxRed = 12;
-const int maxGreen = 13;
-const int maxBlue = 14;
-
 var games = File.ReadAllText(DataFile)
     .TrimEnd('\n')
     .Split(Environment.NewLine)
@@ -15,6 +11,10 @@ Console.WriteLine($"Second: {Second(games)}");
 
 static int First(IEnumerable<Game> games)
 {
+    const int maxRed = 12;
+    const int maxGreen = 13;
+    const int maxBlue = 14;
+
     static bool IsSetWithinLimits(Set set)
         => set.Red <= maxRed && set.Green <= maxGreen && set.Blue <= maxBlue;
 
