@@ -36,32 +36,25 @@ while (fileSpan.Length > cursor)
     }
 }
 
-var connectedNumbers = new List<Number>();
-foreach (var number in numbers)
-{
-    if (IsNumberConnected(number, symbols, width))
-    {
-        connectedNumbers.Add(number);
-    }
-}
+var connectedNumbers = 
+    numbers.Where(n => IsNumberConnected(n, symbols, width))
+    .ToArray();
 
-var sum = 0;
-foreach (var number in connectedNumbers)
-{
-    var value = int.Parse(fileSpan[number.Start..(number.End + 1)]);
-    sum += value;
-}
+var first = connectedNumbers
+    .Select(n => n.Value)
+    .Sum();
 
-Console.WriteLine($"First: {sum}");
+Console.WriteLine($"First: {first}");
 
-var gearRatioSum = 0;
-foreach (var symbol in symbols)
-{
-    if (symbol.Char != '*') continue;
-    var nums = GetConnectedNumbers(symbol, numbers, width).ToArray();
-    if (nums.Length != 2) continue;
-    gearRatioSum += nums[0].Value * nums[1].Value;
-}
+var gearRatioSum = symbols
+    .Where(s => s.Char == '*')
+    .Select(symbol => {
+        var nums = GetConnectedNumbers(symbol, connectedNumbers, width).ToArray();
+        return nums.Length == 2
+            ? nums[0].Value * nums[1].Value
+            : 0;
+    })
+    .Sum();
 
 Console.WriteLine($"Second: {gearRatioSum}");
 
@@ -82,7 +75,7 @@ static bool IsNumberConnected(Number number, IEnumerable<Symbol> symbols, int wi
     return false;
 }
 
-static IEnumerable<Number> GetConnectedNumbers(Symbol symbol, List<Number> numbers, int width)
+static IEnumerable<Number> GetConnectedNumbers(Symbol symbol, IEnumerable<Number> numbers, int width)
 {
     return numbers.Where(number => IsNumberConnected(number, Enumerable.Repeat(symbol, 1), width));
 }
