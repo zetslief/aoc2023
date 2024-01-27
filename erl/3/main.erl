@@ -8,11 +8,22 @@ main() ->
     {Numbers, Symbols} = parse(FileContent),
     drawNumbers(Numbers, Symbols, RowWidth),
     drawSymbols(Symbols, RowWidth),
+    first(Numbers, Symbols, RowWidth),
+    second(Numbers, Symbols, RowWidth).
+
+first(Numbers, Symbols, RowWidth) ->
     IsConnected = fun (Number) -> is_number_connected(Number, Symbols, RowWidth) end,
-    SumOfConnected = lists:sum(lists:map(
-                fun ({_, _, Number}) -> Number end,
-                lists:filter(IsConnected, Numbers))),
+    ExtractNumber = fun ({_, _, Number}) -> Number end,
+    ConnectedNumbers = lists:filter(IsConnected, Numbers),
+    SumOfConnected = lists:sum(lists:map(ExtractNumber, ConnectedNumbers)),
     io:format("First: ~w~n", [SumOfConnected]).
+
+second(Numbers, Symbols, RowWidth) ->
+    FindConnectedNumbers = fun (Symbol) -> find_connected_numbers(Symbol, Numbers, RowWidth) end,
+    Power = fun(N) -> power_of_connected_numbers(N) end,
+    ConnectedSymbols = lists:map(Power, lists:map(FindConnectedNumbers, Symbols)),
+    Result = lists:sum(ConnectedSymbols),
+    io:format("Second: ~w~n", [Result]).
 
 drawNumber({StartIndex, EndIndex, Number}, Symbols, RowWidth) ->
     Start = from_flat_index(StartIndex, RowWidth),
@@ -30,7 +41,6 @@ drawSymbols(Symbols, Width) ->
     lists:foreach(
       fun (Symbol) -> drawSymbol(Symbol, Width) end,
       Symbols).
-
 
 parse(Content) ->
     parse(Content, 0, [], []).
@@ -72,3 +82,15 @@ is_number_connected(NumberIndex, NumberEndIndex, SymbolIndex, RowWidth) ->
     StartWithinOneColumn = (NumberColumn - 1) =< SymbolColumn,
     EndWihinOneColumn = NumberEndColumn >= SymbolColumn,
     WithinOneRow and StartWithinOneColumn and EndWihinOneColumn.
+
+power_of_connected_numbers([{_, _, FirstNumber}, {_, _, SecondNumber}]) ->
+    FirstNumber * SecondNumber;
+power_of_connected_numbers(_Numbers) ->
+    0.
+
+find_connected_numbers({Index, <<"*">>}, Numbers, RowWidth) ->
+    Symbols = [{Index, <<"*">>}],
+    IsNumberConnected = fun (Number) -> is_number_connected(Number, Symbols, RowWidth) end,
+    lists:filter(IsNumberConnected, Numbers);
+find_connected_numbers(_Symbol, _Numbers, _RowWidth) ->
+    [].
