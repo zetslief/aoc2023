@@ -21,7 +21,8 @@ first(Numbers, Symbols, RowWidth) ->
 second(Numbers, Symbols, RowWidth) ->
     FindConnectedNumbers = fun (Symbol) -> find_connected_numbers(Symbol, Numbers, RowWidth) end,
     Power = fun(N) -> power_of_connected_numbers(N) end,
-    ConnectedSymbols = lists:map(Power, lists:map(FindConnectedNumbers, Symbols)),
+    ConnectedNumbers = lists:map(FindConnectedNumbers, Symbols),
+    ConnectedSymbols = lists:map(Power, ConnectedNumbers),
     Result = lists:sum(ConnectedSymbols),
     io:format("Second: ~w~n", [Result]).
 
