@@ -24,7 +24,7 @@ static void Second(IReadOnlyList<Card> cards)
         var match = EvaluateNumberOfMatches(cards[cardIndex]);
         for (int matchIndex = 0; matchIndex < match; ++matchIndex)
         {
-            var winCardIndex = cardIndex + 1 + matchIndex;
+            var winCardIndex = cardIndex + 1 + matchIndex; // +1 is required because we do not want to give points to current card card!
             if (winCardIndex == cards.Count) break;
             storage[winCardIndex] += points;
         }
