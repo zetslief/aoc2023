@@ -5,16 +5,43 @@ Console.WriteLine(fileContent.ToString());
 
 var cards = ParseCards(fileContent);
 
-var first = cards.Select(EvaluateCard).Sum();
-Console.WriteLine($"First: {first}");
+First(cards);
+Second(cards);
+
+static void First(IReadOnlyCollection<Card> cards)
+{
+    var first = cards.Select(EvaluateCard).Sum();
+    Console.WriteLine($"First: {first}");
+}
+
+static void Second(IReadOnlyList<Card> cards)
+{
+    var storage = new int[cards.Count];
+    Array.Fill(storage, 1);
+    for (int cardIndex = 0; cardIndex < cards.Count; ++cardIndex)
+    {
+        var points = storage[cardIndex];
+        var match = EvaluateNumberOfMatches(cards[cardIndex]);
+        for (int matchIndex = 0; matchIndex < match; ++matchIndex)
+        {
+            var winCardIndex = cardIndex + 1 + matchIndex;
+            if (winCardIndex == cards.Count) break;
+            storage[winCardIndex] += points;
+        }
+    }
+    Console.WriteLine($"Second: {storage.Sum()}");
+}
 
 static int EvaluateCard(Card card)
 {
-    int match = card.AvailableNumbers.Count(card.WinNumbers.Contains);
+    var match = EvaluateNumberOfMatches(card);
     return match == 0 ? 0 : 1 << (match - 1);
 }
 
-static IReadOnlyCollection<Card> ParseCards(ReadOnlySpan<char> content)
+static int EvaluateNumberOfMatches(Card card)
+    => card.AvailableNumbers.Count(card.WinNumbers.Contains);
+
+static IReadOnlyList<Card> ParseCards(ReadOnlySpan<char> content)
 {
     var result = new List<Card>();
 
