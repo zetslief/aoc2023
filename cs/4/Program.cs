@@ -5,10 +5,8 @@ Console.WriteLine(fileContent.ToString());
 
 var cards = ParseCards(fileContent);
 
-foreach (var card in cards)
-{
-    Console.WriteLine((card, EvaluateCard(card)));
-}
+var first = cards.Select(EvaluateCard).Sum();
+Console.WriteLine($"First: {first}");
 
 static int EvaluateCard(Card card)
 {
