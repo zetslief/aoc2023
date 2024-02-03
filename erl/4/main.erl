@@ -15,7 +15,7 @@ parse(Content, Results) ->
     {Header, HeaderRest} = parse_header(Content),
     {Wins, WinRest} = parse_numbers(HeaderRest, <<"|">>),
     {Available, AvailableRest} = parse_numbers(WinRest, <<"\n">>),
-    parse(AvailableRest, [{Header, Wins, Available} |  Results]).
+    parse(AvailableRest, [{Header, sets:from_list(Wins), Available} |  Results]).
 
 parse_header(Content) ->
     parse_header(Content, <<>>).
