@@ -4,7 +4,8 @@
 main() ->
     {ok, FileContent} = file:read_file("./../../data/4.txt"),
     Games = parse(FileContent),
-    io:format("First: ~w~n", [first(Games)]).
+    io:format("First: ~w~n", [first(Games)]),
+    io:format("Second: ~w~n", [second(Games)]).
 
 first(Games) ->
     FindNumbersThatWon = fun ({_, Wins, Numbers}) -> findNumbersThatWon(Wins, Numbers) end,
@@ -14,6 +15,9 @@ first(Games) ->
           lists:map(
             FindNumbersThatWon,
             Games))).
+
+second(Games) ->
+    not_implemented.
 
 calculatePoints(Numbers) ->
     math:floor(math:pow(2, length(Numbers) - 1)).
